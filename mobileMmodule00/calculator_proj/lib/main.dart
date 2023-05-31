@@ -1,5 +1,6 @@
 import 'package:calculator_proj/widgets/calcButton.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,8 +37,24 @@ class _MyHomePageState extends State<MyHomePage> {
   String res = "";
   String operation = "";
 
-  String checkOpration(String num1, String op, String num2) {
-    return "";
+  String checkOpration(int num1, String op, int num2) {
+    String output = "";
+    Expression exp = Parser().parse("$num1 $operation $num2");
+    output = exp.toString();
+    // if (op == '+') {
+    //   output = (num1 + num2).toString();
+    //   history = num1.toString() + op.toString() + num2.toString();
+    // } else if (op == '-') {
+    //   output = (num1 - num2).toString();
+    //   history = num1.toString() + op.toString() + num2.toString();
+    // } else if (op == 'x') {
+    //   output = (num1 * num2).toString();
+    //   history = num1.toString() + op.toString() + num2.toString();
+    // } else if (op == '/') {
+    //   output = (num1 / num2).toString();
+    //   history = num1.toString() + op.toString() + num2.toString();
+    // }
+    return output;
   }
 
   void btnOnClick(String btnVal) {
@@ -55,9 +72,17 @@ class _MyHomePageState extends State<MyHomePage> {
       history = "0";
     } else if (btnVal == "+/-") {
       if (textToDisplay[0] != '-') {
-        res = '-' + textToDisplay;
+        res = '-$textToDisplay';
       } else {
         res = textToDisplay.substring(1);
+      }
+    } else if (btnVal == '.') {
+      if (textToDisplay.contains('.')) {
+        res = res;
+      } else if (textToDisplay[textToDisplay.length - 1] != '.') {
+        res = '$textToDisplay.';
+      } else {
+        res = textToDisplay.substring(0, textToDisplay.length - 1);
       }
     } else if (btnVal == '+' ||
         btnVal == '-' ||
@@ -65,32 +90,23 @@ class _MyHomePageState extends State<MyHomePage> {
         btnVal == '/') {
       res = '0';
       operation = btnVal;
-      history = firstNum.toString() + operation;
       if (firstNum == 0) {
         firstNum = int.parse(textToDisplay);
-      } else {}
+      } else {
+        firstNum = int.parse(checkOpration(
+            firstNum, history[history.length - 1], int.parse(textToDisplay)));
+      }
+      history = firstNum.toString() + operation;
     } else if (btnVal == "=") {
       secondNum = int.parse(textToDisplay);
-      if (operation == '+') {
-        res = (firstNum + secondNum).toString();
-        history =
-            firstNum.toString() + operation.toString() + secondNum.toString();
-      } else if (operation == '-') {
-        res = (firstNum - secondNum).toString();
-        history =
-            firstNum.toString() + operation.toString() + secondNum.toString();
-      } else if (operation == 'x') {
-        res = (firstNum * secondNum).toString();
-        history =
-            firstNum.toString() + operation.toString() + secondNum.toString();
-      } else if (operation == '/') {
-        res = (firstNum / secondNum).toString();
-        history =
-            firstNum.toString() + operation.toString() + secondNum.toString();
-      }
+      res = checkOpration(firstNum, operation, secondNum);
       operation = "";
     } else {
-      res = int.parse(textToDisplay + btnVal).toString();
+      if (textToDisplay.contains('.')) {
+        res = textToDisplay + btnVal;
+      } else {
+        res = int.parse(textToDisplay + btnVal).toString();
+      }
     }
     setState(() {
       textToDisplay = res;
