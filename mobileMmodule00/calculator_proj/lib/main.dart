@@ -1,3 +1,4 @@
+import 'package:calculator_proj/model/buttonItemModel.dart';
 import 'package:calculator_proj/widgets/calcButton.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
@@ -30,91 +31,183 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int firstNum = 0;
-  int secondNum = 0;
   String history = "0";
   String textToDisplay = "0";
-  String res = "";
   String operation = "";
+  int len = 0;
 
-  String checkOpration(int num1, String op, int num2) {
-    String output = "";
-    Expression exp = Parser().parse("$num1 $operation $num2");
-    output = exp.toString();
-    // if (op == '+') {
-    //   output = (num1 + num2).toString();
-    //   history = num1.toString() + op.toString() + num2.toString();
-    // } else if (op == '-') {
-    //   output = (num1 - num2).toString();
-    //   history = num1.toString() + op.toString() + num2.toString();
-    // } else if (op == 'x') {
-    //   output = (num1 * num2).toString();
-    //   history = num1.toString() + op.toString() + num2.toString();
-    // } else if (op == '/') {
-    //   output = (num1 / num2).toString();
-    //   history = num1.toString() + op.toString() + num2.toString();
-    // }
-    return output;
+  bool isOperator(String x) {
+    if (x == '/' || x == 'x' || x == '-' || x == '+' || x == '=') {
+      return true;
+    }
+    return false;
+  }
+
+  String calcul() {
+    String op = history.replaceAll('x', '*') + textToDisplay;
+    Expression exp = Parser().parse(op);
+    debugPrint('exp: $exp');
+    double answer = exp.evaluate(EvaluationType.REAL, ContextModel());
+    return answer.toString();
   }
 
   void btnOnClick(String btnVal) {
-    print(btnVal);
+    debugPrint(btnVal);
     if (btnVal == 'C') {
-      firstNum = 0;
-      secondNum = 0;
       textToDisplay = "0";
-      res = "0";
     } else if (btnVal == 'AC') {
-      firstNum = 0;
-      secondNum = 0;
       textToDisplay = "0";
-      res = "0";
       history = "0";
+      operation = "";
     } else if (btnVal == "+/-") {
-      if (textToDisplay[0] != '-') {
-        res = '-$textToDisplay';
+      if (textToDisplay == "0") {
+        textToDisplay;
+      } else if (textToDisplay[0] != '-') {
+        textToDisplay = '-$textToDisplay';
       } else {
-        res = textToDisplay.substring(1);
+        textToDisplay = textToDisplay.substring(1);
       }
     } else if (btnVal == '.') {
-      if (textToDisplay.contains('.')) {
-        res = res;
-      } else if (textToDisplay[textToDisplay.length - 1] != '.') {
-        res = '$textToDisplay.';
-      } else {
-        res = textToDisplay.substring(0, textToDisplay.length - 1);
+      if (!textToDisplay.contains('.') &&
+          textToDisplay[textToDisplay.length - 1] != '.') {
+        textToDisplay = '$textToDisplay.';
       }
     } else if (btnVal == '+' ||
         btnVal == '-' ||
         btnVal == 'x' ||
         btnVal == '/') {
-      res = '0';
-      operation = btnVal;
-      if (firstNum == 0) {
-        firstNum = int.parse(textToDisplay);
-      } else {
-        firstNum = int.parse(checkOpration(
-            firstNum, history[history.length - 1], int.parse(textToDisplay)));
+      if ((history != "0" || textToDisplay != "0")) {
+        if (len == 0) {
+          if (isOperator(history[history.length - 1])) {
+            history = history.replaceAll(history[history.length - 1], btnVal);
+          } else {
+            history += btnVal;
+          }
+        } else {
+          if (history == "0" || (history != "0" && operation != "")) {
+            print("here");
+            history = calcul() + btnVal;
+          } else {
+            history += btnVal;
+            history = calcul();
+          }
+          len = 0;
+        }
+        textToDisplay = "0";
+        operation = btnVal;
+      } else if (len != 0 && history == "0") {
+        history = textToDisplay + btnVal;
+        operation = btnVal;
       }
-      history = firstNum.toString() + operation;
     } else if (btnVal == "=") {
-      secondNum = int.parse(textToDisplay);
-      res = checkOpration(firstNum, operation, secondNum);
-      operation = "";
+      if (operation != "" && len != 0) {
+        history = calcul();
+        textToDisplay = "0";
+        operation = "";
+        len = 0;
+      }
+    } else if (textToDisplay.length >= 13) {
+      textToDisplay;
     } else {
-      if (textToDisplay.contains('.')) {
-        res = textToDisplay + btnVal;
+      len++;
+      if (textToDisplay == "0") {
+        if (btnVal == "00") {
+          textToDisplay;
+        } else {
+          textToDisplay = btnVal;
+        }
       } else {
-        res = int.parse(textToDisplay + btnVal).toString();
+        textToDisplay += btnVal;
       }
     }
     setState(() {
-      textToDisplay = res;
+      textToDisplay;
+      history;
     });
   }
 
+  final List<ButtonItemModel> _items = [
+    ButtonItemModel(
+      text: 'AC',
+      textColor: Colors.red,
+      fillColor: Colors.white60,
+    ),
+    ButtonItemModel(
+      text: 'C',
+      textColor: Colors.red,
+      fillColor: Colors.white60,
+    ),
+    ButtonItemModel(
+      text: '+/-',
+      textColor: Colors.black,
+      fillColor: Colors.white60,
+      textSize: 24,
+    ),
+    ButtonItemModel(
+      text: '/',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(
+      text: '7',
+    ),
+    ButtonItemModel(
+      text: '8',
+    ),
+    ButtonItemModel(
+      text: '9',
+    ),
+    ButtonItemModel(
+      text: 'x',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(
+      text: '4',
+    ),
+    ButtonItemModel(
+      text: '5',
+    ),
+    ButtonItemModel(
+      text: '6',
+    ),
+    ButtonItemModel(
+      text: '+',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(
+      text: '1',
+    ),
+    ButtonItemModel(
+      text: '2',
+    ),
+    ButtonItemModel(
+      text: '3',
+    ),
+    ButtonItemModel(
+      text: '-',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(text: '0'),
+    ButtonItemModel(text: '.'),
+    ButtonItemModel(text: '00'),
+    ButtonItemModel(
+      text: '=',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    // var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black87,
@@ -125,195 +218,50 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
       ),
       body: Container(
-        padding: EdgeInsets.only(left: 5, right: 5),
+        padding: const EdgeInsets.only(left: 5, right: 5),
         color: Colors.black,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Container(
-              alignment: AlignmentDirectional.bottomEnd,
-              child: Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Text(
-                  history,
-                  style: TextStyle(fontSize: 22, color: Colors.white70),
+            Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.only(top: 10, right: 20),
+                      alignment: AlignmentDirectional.bottomEnd,
+                      child: Text(
+                        history,
+                        style: const TextStyle(
+                            fontSize: 22, color: Colors.white70),
+                      ),
+                    ),
+                    Container(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Text(
+                        textToDisplay,
+                        style:
+                            const TextStyle(fontSize: 44, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                )),
+            Expanded(
+              flex: 2,
+              child: GridView.builder(
+                padding: const EdgeInsets.all(5),
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _items.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 1,
+                  mainAxisExtent: 80,
                 ),
+                itemBuilder: (context, index) {
+                  return CalcButton(item: _items[index], callback: btnOnClick);
+                },
               ),
-            ),
-            Container(
-              alignment: AlignmentDirectional.bottomEnd,
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: Text(
-                  textToDisplay,
-                  style: TextStyle(fontSize: 44, color: Colors.white),
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalcButton(
-                  text: 'AC',
-                  textColor: Colors.red,
-                  fillColor: Colors.white60,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: 'C',
-                  textColor: Colors.red,
-                  fillColor: Colors.white60,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '+/-',
-                  textColor: Colors.black,
-                  fillColor: Colors.white60,
-                  textSize: 24,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '/',
-                  textColor: Colors.white,
-                  fillColor: Colors.orangeAccent,
-                  textSize: 34,
-                  callback: btnOnClick,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalcButton(
-                  text: '7',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '8',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '9',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: 'x',
-                  textColor: Colors.white,
-                  fillColor: Colors.orangeAccent,
-                  textSize: 34,
-                  callback: btnOnClick,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalcButton(
-                  text: '4',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '5',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '6',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '+',
-                  textColor: Colors.white,
-                  fillColor: Colors.orangeAccent,
-                  textSize: 34,
-                  callback: btnOnClick,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalcButton(
-                  text: '1',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '2',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '3',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '-',
-                  textColor: Colors.white,
-                  fillColor: Colors.orangeAccent,
-                  textSize: 34,
-                  callback: btnOnClick,
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CalcButton(
-                  text: '0',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '.',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '00',
-                  textColor: Colors.white,
-                  fillColor: Colors.white12,
-                  textSize: 26,
-                  callback: btnOnClick,
-                ),
-                CalcButton(
-                  text: '=',
-                  textColor: Colors.white,
-                  fillColor: Colors.orangeAccent,
-                  textSize: 34,
-                  callback: btnOnClick,
-                ),
-              ],
             ),
           ],
         ),
