@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 
 class CalcButton extends StatelessWidget {
   final ButtonItemModel item;
+  final isPortrait;
   final Function callback;
 
   const CalcButton({
     super.key,
     required this.item,
+    required this.isPortrait,
     required this.callback,
   });
 
@@ -24,7 +26,9 @@ class CalcButton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(100))),
             child: Text(
               item.text,
-              style: TextStyle(fontSize: item.textSize, color: item.textColor),
+              style: TextStyle(
+                  fontSize: isPortrait ? item.textSize : item.textSize - 5,
+                  color: item.textColor),
             )),
       ),
     );
