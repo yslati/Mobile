@@ -33,9 +33,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String history = "0";
-  String textToDisplay = "0";
-  String operation = "";
-  int len = 0;
+  String result = "0";
 
   bool isOperator(String x) {
     if (x == '/' || x == 'x' || x == '-' || x == '+' || x == '=') {
@@ -45,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String calcul() {
-    String op = history.replaceAll('x', '*') + textToDisplay;
+    String op = history.replaceAll('x', '*');
     Expression exp = Parser().parse(op);
     double answer = exp.evaluate(EvaluationType.REAL, ContextModel());
     return answer.toString();
@@ -54,76 +52,68 @@ class _MyHomePageState extends State<MyHomePage> {
   void btnOnClick(String btnVal) {
     debugPrint('button pressed :$btnVal');
     if (btnVal == 'C') {
-      textToDisplay = "0";
-      len = 0;
-      operation = "";
+      if (history.length >= 1 && history != '0') {
+        history = history.substring(0, history.length - 1);
+        if (history == '') {
+          history = "0";
+        }
+      }
     } else if (btnVal == 'AC') {
-      textToDisplay = "0";
+      result = "0";
       history = "0";
-      operation = "";
-      len = 0;
     } else if (btnVal == "+/-") {
-      if (textToDisplay == "0") {
-        textToDisplay;
-      } else if (textToDisplay[0] != '-') {
-        textToDisplay = '-$textToDisplay';
+      if (history == "0") {
+        history = "-";
+      } else if (history[history.length - 1] == '-') {
+        history = history.substring(0, history.length - 1);
       } else {
-        textToDisplay = textToDisplay.substring(1);
+        history += "-";
       }
     } else if (btnVal == '.') {
-      if (!textToDisplay.contains('.') &&
-          textToDisplay[textToDisplay.length - 1] != '.') {
-        textToDisplay = '$textToDisplay.';
+      if (history[history.length - 1] != '.') {
+        history = '$history.';
       }
     } else if (btnVal == '+' ||
         btnVal == '-' ||
         btnVal == 'x' ||
         btnVal == '/') {
-      if ((history != "0" || textToDisplay != "0")) {
-        if (len == 0) {
-          if (isOperator(history[history.length - 1])) {
+      if (result != "0") {
+        history = result + btnVal;
+        result = "0";
+      } else {
+        if (history.length < 2 && isOperator(history[0])) {
+          history;
+        } else if (isOperator(history[history.length - 1])) {
+          if (!isOperator(history[history.length - 2])) {
             history = history.replaceAll(history[history.length - 1], btnVal);
-          } else {
-            history += btnVal;
           }
         } else {
-          if (history == "0" || (history != "0" && operation != "")) {
-            history = calcul() + btnVal;
-          } else {
-            history += btnVal;
-            history = calcul();
-          }
-          len = 0;
+          history += btnVal;
         }
-        textToDisplay = "0";
-        operation = btnVal;
-      } else if (len != 0 && history == "0") {
-        history = textToDisplay + btnVal;
-        operation = btnVal;
       }
     } else if (btnVal == "=") {
-      if (operation != "" && len != 0) {
-        history = calcul();
-        textToDisplay = "0";
-        operation = "";
-        len = 0;
+      if (history.length >= 3 && !isOperator(history[history.length - 1])) {
+        result = calcul();
       }
-    } else if (textToDisplay.length >= 13) {
-      textToDisplay;
+    } else if (history.length >= 17) {
+      history;
     } else {
-      len++;
-      if (textToDisplay == "0") {
+      if (result != "0") {
+        history = "0";
+        result = "0";
+      }
+      if (history == "0") {
         if (btnVal == "00") {
-          textToDisplay;
+          history;
         } else {
-          textToDisplay = btnVal;
+          history = btnVal;
         }
       } else {
-        textToDisplay += btnVal;
+        history += btnVal;
       }
     }
     setState(() {
-      textToDisplay;
+      result;
       history;
     });
   }
@@ -207,24 +197,14 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
   ];
 
-  final List<ButtonItemModel> _items_portrait = [
+  final List<ButtonItemModel> _itemsPortrait = [
+    ButtonItemModel(text: '7'),
+    ButtonItemModel(text: '8'),
+    ButtonItemModel(text: '9'),
     ButtonItemModel(
-      text: '/',
-      textColor: Colors.white,
-      fillColor: Colors.orangeAccent,
-      textSize: 30,
-    ),
-    ButtonItemModel(
-      text: 'x',
-      textColor: Colors.white,
-      fillColor: Colors.orangeAccent,
-      textSize: 30,
-    ),
-    ButtonItemModel(
-      text: '-',
-      textColor: Colors.white,
-      fillColor: Colors.orangeAccent,
-      textSize: 30,
+      text: 'AC',
+      textColor: Colors.red,
+      fillColor: Colors.white60,
     ),
     ButtonItemModel(
       text: '+',
@@ -232,36 +212,46 @@ class _MyHomePageState extends State<MyHomePage> {
       fillColor: Colors.orangeAccent,
       textSize: 30,
     ),
-    ButtonItemModel(
-      text: 'AC',
-      textColor: Colors.red,
-      fillColor: Colors.white60,
-    ),
+    ButtonItemModel(text: '4'),
+    ButtonItemModel(text: '5'),
     ButtonItemModel(text: '6'),
-    ButtonItemModel(text: '7'),
-    ButtonItemModel(text: '8'),
-    ButtonItemModel(text: '9'),
     ButtonItemModel(
       text: 'C',
       textColor: Colors.red,
       fillColor: Colors.white60,
     ),
+    ButtonItemModel(
+      text: '-',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(text: '1'),
     ButtonItemModel(text: '2'),
     ButtonItemModel(text: '3'),
-    ButtonItemModel(text: '4'),
-    ButtonItemModel(text: '5'),
     ButtonItemModel(
       text: '+/-',
       textColor: Colors.black,
       fillColor: Colors.white60,
       textSize: 24,
     ),
+    ButtonItemModel(
+      text: 'x',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
     ButtonItemModel(text: '0'),
-    ButtonItemModel(text: '1'),
-    ButtonItemModel(text: '.'),
     ButtonItemModel(text: '00'),
+    ButtonItemModel(text: '.'),
     ButtonItemModel(
       text: '=',
+      textColor: Colors.white,
+      fillColor: Colors.orangeAccent,
+      textSize: 30,
+    ),
+    ButtonItemModel(
+      text: '/',
       textColor: Colors.white,
       fillColor: Colors.orangeAccent,
       textSize: 30,
@@ -312,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       alignment: AlignmentDirectional.bottomEnd,
                       padding: const EdgeInsets.only(right: 20),
                       child: Text(
-                        textToDisplay,
+                        result,
                         style: TextStyle(
                           fontSize: isPortrait ? 44 : 30,
                           color: Colors.white,
@@ -330,12 +320,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: isPortrait ? 4 : 5,
                   childAspectRatio: 1,
-                  mainAxisExtent: isPortrait ? 80 : 50,
+                  mainAxisExtent: isPortrait ? 100 : 50,
                   crossAxisSpacing: isPortrait ? 0 : 15,
                 ),
                 itemBuilder: (context, index) {
                   return CalcButton(
-                    item: isPortrait ? _items[index] : _items_portrait[index],
+                    item: isPortrait ? _items[index] : _itemsPortrait[index],
                     isPortrait: isPortrait,
                     callback: btnOnClick,
                   );
