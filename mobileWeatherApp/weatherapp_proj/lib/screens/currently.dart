@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class Today extends StatelessWidget {
+class Currently extends StatelessWidget {
   final String search;
-  const Today({
+  const Currently({
     super.key,
     this.search = "",
   });
@@ -16,7 +16,7 @@ class Today extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              "Today",
+              "Currently",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 26,

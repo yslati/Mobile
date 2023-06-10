@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weatherapp_proj/screens/currenty.dart';
+import 'package:weatherapp_proj/screens/currently.dart';
 import 'package:weatherapp_proj/screens/today.dart';
 import 'package:weatherapp_proj/screens/weekly.dart';
 
@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
       title: 'Weather App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
@@ -35,18 +38,19 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _searchController = TextEditingController();
   final _bottomNavigationBarItems = [
     const BottomNavigationBarItem(
-      icon: Icon(Icons.star),
+      icon: Icon(Icons.sunny),
       label: "Currently",
     ),
     const BottomNavigationBarItem(
-      icon: Icon(Icons.star),
+      icon: Icon(Icons.today),
       label: "Today",
     ),
     const BottomNavigationBarItem(
-      icon: Icon(Icons.star),
+      icon: Icon(Icons.calendar_month),
       label: "Weekly",
     ),
   ];
+  String _searchText = "";
   int _selectedPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -59,59 +63,100 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // extendBody: true,
       appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [Colors.blue.shade400, Colors.blue.shade700],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
-            ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [Colors.blue.shade400, Colors.blue.shade700],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight),
           ),
-          title: Row(
-            children: <Widget>[
-              const Text(
-                "Location:  ",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Flexible(
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(color: Colors.white),
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.white54),
-                    border: InputBorder.none,
-                  ),
-                ),
-              )
-            ],
-          )),
+        ),
+        title: _title(),
+      ),
       body: PageView(
         controller: _pageController,
         onPageChanged: _onItemTapped,
-        children: const [
-          Currently(),
-          Today(),
-          Weekly(),
+        children: [
+          Currently(
+            search: _searchText,
+          ),
+          Today(
+            search: _searchText,
+          ),
+          Weekly(
+            search: _searchText,
+          ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: _bottomNavigationBarItems,
-        currentIndex: _selectedPage,
-        onTap: (index) {
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.ease,
-          );
-        },
-      ),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
+  }
+
+  Widget _bottomNavigationBar() {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      items: _bottomNavigationBarItems,
+      currentIndex: _selectedPage,
+      backgroundColor: Colors.white,
+      selectedFontSize: 17,
+      // selectedIconTheme: const IconThemeData(color: Colors.white, size: 30),
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      selectedItemColor: Colors.yellow.shade800,
+      unselectedIconTheme: const IconThemeData(color: Colors.blueAccent),
+      showUnselectedLabels: false,
+      elevation: 0,
+      onTap: (index) {
+        _pageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.ease,
+        );
+      },
+    );
+  }
+
+  Widget _title() {
+    return Row(
+      children: <Widget>[
+        const Icon(
+          Icons.search,
+          color: Colors.white70,
+        ),
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onSubmitted: (value) {
+                setState(() {
+                  _searchText = value;
+                });
+              },
+              controller: _searchController,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
+              decoration: const InputDecoration(
+                hintText: 'Search location...',
+                hintStyle: TextStyle(color: Colors.white54),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ),
+        const Text(
+          "| ",
+          style: TextStyle(
+            fontWeight: FontWeight.w300,
+            color: Colors.white70,
+            fontSize: 40,
+          ),
+        ),
+        const Icon(
+          Icons.near_me,
+          color: Colors.white70,
+        ),
+      ],
     );
   }
 }
