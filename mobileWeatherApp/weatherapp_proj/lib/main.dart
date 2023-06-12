@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
       label: "Weekly",
     ),
   ];
-  String _searchText = "";
+  String _localisation = "";
   int _selectedPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -80,13 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
         onPageChanged: _onItemTapped,
         children: [
           Currently(
-            search: _searchText,
+            search: _localisation,
           ),
           Today(
-            search: _searchText,
+            search: _localisation,
           ),
           Weekly(
-            search: _searchText,
+            search: _localisation,
           ),
         ],
       ),
@@ -100,13 +100,12 @@ class _MyHomePageState extends State<MyHomePage> {
       items: _bottomNavigationBarItems,
       currentIndex: _selectedPage,
       backgroundColor: Colors.white,
-      selectedFontSize: 17,
-      // selectedIconTheme: const IconThemeData(color: Colors.white, size: 30),
+      selectedFontSize: 15,
+      selectedIconTheme: const IconThemeData(size: 28),
       selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
       selectedItemColor: Colors.yellow.shade800,
-      unselectedIconTheme: const IconThemeData(color: Colors.blueAccent),
-      showUnselectedLabels: false,
-      elevation: 0,
+      unselectedItemColor: Colors.blueAccent,
+      elevation: 50,
       onTap: (index) {
         _pageController.animateToPage(
           index,
@@ -130,7 +129,13 @@ class _MyHomePageState extends State<MyHomePage> {
             child: TextField(
               onSubmitted: (value) {
                 setState(() {
-                  _searchText = value;
+                  _localisation = value;
+                });
+              },
+              onTap: () {
+                setState(() {
+                  _localisation = "";
+                  _searchController.clear();
                 });
               },
               controller: _searchController,
