@@ -4,7 +4,7 @@ class Currently extends StatelessWidget {
   final String search;
   const Currently({
     super.key,
-    this.search = "",
+    required this.search,
   });
 
   @override
@@ -12,26 +12,14 @@ class Currently extends StatelessWidget {
     return Container(
       color: Colors.white,
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Currently",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 26,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              search,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 26,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+        child: Text(
+          "Currently${search.isEmpty ? '' : '\n$search'}",
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
