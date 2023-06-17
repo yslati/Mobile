@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Currently extends StatelessWidget {
   final String search;
+  final bool displayGeo;
+  final Position? position;
   const Currently({
     super.key,
     required this.search,
+    required this.displayGeo,
+    this.position,
   });
 
   @override
@@ -13,7 +18,9 @@ class Currently extends StatelessWidget {
       color: Colors.white,
       child: Center(
         child: Text(
-          "Currently${search.isEmpty ? '' : '\n$search'}",
+          displayGeo == true
+              ? "Currently\n${position?.latitude ?? ''} / ${position?.longitude ?? ''}"
+              : "Currently\n $search",
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: Colors.black,
