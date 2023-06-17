@@ -21,6 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedPage = 0;
   Position? _currentPosition;
   bool _displayGeoLocation = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -105,6 +106,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> getCurrentPosition() async {
+    setState(() {
+      isLoading = true;
+    });
     final hasPermission = await handleLocationPermission();
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
@@ -112,6 +116,7 @@ class _MainScreenState extends State<MainScreen> {
       setState(() {
         _displayGeoLocation = true;
         _currentPosition = position;
+        isLoading = false;
       });
     }).catchError((e) {
       debugPrint(e);
@@ -125,6 +130,7 @@ class _MainScreenState extends State<MainScreen> {
         search: _searchText,
         displayGeo: _displayGeoLocation,
         position: _currentPosition,
+        isLoading: isLoading,
       ),
       Today(
         search: _searchText,
